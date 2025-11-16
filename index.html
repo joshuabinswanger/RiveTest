@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Rive Fullscreen Canvas</title>
     <!-- Rive Web (Canvas) runtime -->
-    <script defer src="https://unpkg.com/@rive-app/canvas@2.18.0"></script>
+    <script src="https://unpkg.com/@rive-app/canvas"></script>
     <style>
       /* Make the canvas fill the entire viewport */
       html,
@@ -35,13 +35,27 @@
 
         // Create the Rive renderer
         const r = new rive.Rive({
-          // TODO: point this to your .riv file
-          // e.g. 'assets/your_animation.riv' placed next to this file in an /assets folder
-          src: "assets/RSWS_RiveTest.riv",
-          canvas,
+          src: "assets/RSWS_RiveTest1.riv",
+          canvas: canvas,
           artboard: "Artboard",
           stateMachines: "State Machine 1",
           autoplay: true,
+          autoBind: true,
+
+          onLoad: () => {
+            r.resizeDrawingSurfaceToCanvas();
+
+            const vmi = r.viewModelInstance;
+
+            const SatteliteLinkOut = vmi.trigger("SatteliteLinkOut");
+            // Observe
+            SatteliteLinkOut.on((event) => {
+              window.open(
+                "https://www.geo.uzh.ch/en/units/rsws/research/SAR_Lab.html",
+                "_blank"
+              );
+            });
+          },
         });
 
         // Handle high-DPI (retina) and resizing so the canvas stays sharp & 100%
