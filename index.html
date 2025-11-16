@@ -48,12 +48,14 @@
             const vmi = r.viewModelInstance;
 
             const SatteliteLinkOut = vmi.trigger("SatteliteLinkOut");
+            const SatteliteOpen = vmi.boolean("SatteliteOpen");
             // Observe
             SatteliteLinkOut.on((event) => {
               window.open(
                 "https://www.geo.uzh.ch/en/units/rsws/research/SAR_Lab.html",
                 "_blank"
               );
+              SatteliteOpen.value = true;
             });
           },
         });
