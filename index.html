@@ -35,7 +35,7 @@
 
         // Create the Rive renderer
         const r = new rive.Rive({
-          src: "assets/RSWS_RiveTest1.riv",
+          src: "assets/RSWS_RiveTest2.riv",
           canvas: canvas,
           artboard: "Artboard",
           stateMachines: "State Machine 1",
@@ -47,15 +47,25 @@
 
             const vmi = r.viewModelInstance;
 
+            //Sattelite
             const SatteliteLinkOut = vmi.trigger("SatteliteLinkOut");
             const SatteliteOpen = vmi.boolean("SatteliteOpen");
+
             // Observe
             SatteliteLinkOut.on((event) => {
               window.open(
                 "https://www.geo.uzh.ch/en/units/rsws/research/SAR_Lab.html",
                 "_blank"
               );
-              SatteliteOpen.value = true;
+              SatteliteOpen.value = false;
+            });
+
+            SatteliteOpen.on((event) => {
+              console.log(SatteliteOpen.value);
+              if (SatteliteOpen.value == true) {
+                SatteliteOpen.value = false;
+                console.log(SatteliteOpen.value);
+              }
             });
           },
         });
