@@ -33,6 +33,41 @@
       window.addEventListener("load", function () {
         const canvas = document.getElementById("rive");
 
+        // The .riv still embeds the Round 1 sketches. Swap each embedded image
+        // for the Final 1 illustration at load time. Replacements keep the
+        // original pixel sizes so the layout in the .riv is unchanged.
+        const illustrations = {
+          Tower_Sketch1: "Tower.png",
+          Sattelit_Sketch1: "Sattelite.png",
+          "Häuserschlucht_Sketch1": "Hausschlucht.png",
+          Evapotranspiration_Sketch1: "Evapotranspiration.png",
+          Mine_Sketch1: "Mine.png",
+          Arsen_Sketch1: "Arsen.png",
+          Ladnscape_Sketch1: "Landscape.jpg",
+          Ladnscape_Sketch1_Illustrations: "LandscapeBubbles.png",
+        };
+
+        function setImage(asset, bytes) {
+          return rive.decodeImage(bytes).then((image) => {
+            asset.setRenderImage(image);
+            image.unref();
+          });
+        }
+
+        function replaceImage(asset, file, embeddedBytes) {
+          fetch("assets/illustrations/" + file)
+            .then((res) => {
+              if (!res.ok) throw new Error(res.status + " " + file);
+              return res.arrayBuffer();
+            })
+            .then((buf) => setImage(asset, new Uint8Array(buf)))
+            .catch((err) => {
+              // Fall back to the sketch embedded in the .riv
+              console.warn("Illustration swap failed:", err);
+              setImage(asset, embeddedBytes);
+            });
+        }
+
         // Create the Rive renderer
         const r = new rive.Rive({
           src: "assets/RSWS_RiveTest2.riv",
@@ -41,6 +76,18 @@
           stateMachines: "State Machine 1",
           autoplay: true,
           autoBind: true,
+
+          assetLoader: (asset, bytes) => {
+            if (!asset.isImage) return false;
+            const name = asset.name.normalize("NFC").replace(/\.[^.]+$/, "");
+            const file = illustrations[name];
+            if (!file) {
+              console.warn("No illustration for Rive image:", asset.name);
+              return false;
+            }
+            replaceImage(asset, file, bytes.slice());
+            return true;
+          },
 
           onLoad: () => {
             r.resizeDrawingSurfaceToCanvas();
